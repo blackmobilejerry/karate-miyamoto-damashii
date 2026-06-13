@@ -264,11 +264,59 @@ Three cards side by side:
 - Embed map for "Caeté, MG" (address placeholder — editable in settings)
 
 **Privacy policy link:**
-- Below the form: "Política de Privacidade" → `/privacidade` (simple static page describing LGPD data usage)
+- Below the form: "Política de Privacidade" → `/privacidade`
 
 ---
 
-#### 13. STUDENT AREA (`/area-do-aluno`)
+#### 13. PRIVACY POLICY PAGE (`/privacidade`)
+
+Static page — no Supabase queries needed.
+
+**Page hero:** Title "Política de Privacidade" with breadcrumb
+
+**Content sections:**
+
+1. **Responsável pelo tratamento**
+   - Karatê Miyamoto Damashii Caeté — Caeté/MG
+   - Contato: (31) 98812-8515
+
+2. **Quais dados coletamos**
+   - Formulário de contato: nome, e-mail, telefone, mensagem e modalidade de interesse
+   - Área do Aluno: nome completo, CPF, data de nascimento, telefone, nome e telefone do responsável (para menores)
+   - Dados de uso: frequência às aulas, mensalidades e histórico de faixas
+
+3. **Para que usamos seus dados**
+   - Retorno de contato e agendamento de aulas experimentais
+   - Gestão de matrícula e acompanhamento do aluno
+   - Comunicados internos da academia
+
+4. **Base legal (LGPD — Lei 13.709/2018)**
+   - Consentimento do titular (Art. 7º, I)
+   - Execução de contrato (Art. 7º, V) para alunos matriculados
+
+5. **Compartilhamento**
+   - Os dados não são vendidos nem compartilhados com terceiros.
+   - Podem ser acessados pela equipe interna da academia e pela HelpDigital BH (desenvolvimento e manutenção do sistema).
+
+6. **Seus direitos**
+   - Acesso, correção, exclusão e portabilidade dos seus dados a qualquer momento.
+   - Para exercer seus direitos: WhatsApp (31) 98812-8515.
+
+7. **Retenção**
+   - Dados de contato: até 2 anos ou até solicitação de exclusão.
+   - Dados de alunos: enquanto durar o vínculo com a academia e pelo prazo legal obrigatório após encerramento.
+
+8. **Cookies**
+   - O site pode usar cookies técnicos essenciais para funcionamento da sessão autenticada. Não utilizamos cookies de rastreamento ou publicidade.
+
+**Last updated:** Junho de 2026
+
+**CTA ao final:**
+- "Dúvidas sobre seus dados?" → WhatsApp button
+
+---
+
+#### 14. STUDENT AREA (`/area-do-aluno`)
 
 **Auth flow using Supabase Auth + `profiles` table:**
 
