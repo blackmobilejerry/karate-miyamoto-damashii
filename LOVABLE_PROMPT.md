@@ -337,6 +337,135 @@ Static page — no Supabase queries needed.
 
 ---
 
+#### 15. ADMIN PANEL (`/admin`)
+
+**Auth guard:** if `profiles.role !== 'admin'` redirect to `/area-do-aluno`. All data mutations use the authenticated Supabase client — RLS enforces admin-only access server-side.
+
+**Layout:**
+- Fixed left sidebar (desktop) / bottom tab bar (mobile)
+- Top bar: "Painel Admin — Karatê Miyamoto Damashii" + logout button
+- Content area on the right
+
+**Sidebar navigation modules:**
+
+```
+Dashboard
+Conteúdo
+  ├── Professores
+  ├── Modalidades
+  ├── Horários
+  ├── Eventos
+  ├── Notícias
+  ├── Galeria
+  ├── Documentos
+  ├── FAQ
+  └── Depoimentos
+Alunos
+  ├── Lista de Alunos
+  └── Contatos / Leads
+Configurações
+```
+
+---
+
+**Dashboard (`/admin`)**
+- Summary cards: total active students, unread contacts (badge), next upcoming event, published news count
+- Quick actions: "Nova Notícia", "Novo Evento", "Ver Contatos não lidos"
+
+---
+
+**Professores (`/admin/professores`)**
+- Table: name, belt, experience_years, is_active toggle, display_order, actions
+- "Novo Professor" button → inline form or modal: name*, belt*, experience_years, bio (textarea), specialties (tag input), photo_url, photo_alt, display_order
+- Edit and delete per row; delete asks confirmation dialog
+- Reorder via display_order field
+
+---
+
+**Modalidades (`/admin/modalidades`)**
+- Table: title, target_audience badge, is_active toggle, display_order, actions
+- Form fields: title*, description (textarea), icon (text), target_audience (select: infantil | jovens | adultos | todos), display_order
+- Edit and delete per row
+
+---
+
+**Horários (`/admin/horarios`)**
+- Table grouped by day_of_week: modality_name, start_time, end_time, instructor, location, target_audience badge, is_active toggle, actions
+- "Novo Horário" form: modality_name*, day_of_week (select: Segunda…Sábado)*, start_time*, end_time*, instructor, location, target_audience, max_students, notes, display_order
+- Edit and delete per row
+
+---
+
+**Eventos (`/admin/eventos`)**
+- Table: title, category badge, event_date (formatted), is_public toggle, actions
+- Form fields: title*, description (textarea), category* (select), event_date*, event_time, location, address, image_url, is_public, registration_link
+- Ordered by event_date DESC
+
+---
+
+**Notícias (`/admin/noticias`)**
+- Table: title, category badge, author, is_published toggle, published_at, actions
+- "Nova Notícia" form: title*, slug* (auto-generated from title, editable), summary (textarea), content (textarea — Markdown), cover_image_url, category (select), author, is_published, published_at
+- Auto-set `published_at = now()` when toggling `is_published` to true for the first time
+
+---
+
+**Galeria (`/admin/galeria`)**
+- Grid of thumbnails with overlay controls (edit / delete)
+- "Novo Item" form: title, alt_text*, media_url* (or file upload to Supabase Storage bucket `gallery`), media_type (select: image | video), thumbnail_url, category (select), display_order, is_active
+- File upload: accept image/* and video/*; show upload progress; store public URL in media_url
+
+---
+
+**Documentos (`/admin/documentos`)**
+- Table: title, category badge, is_public toggle, actions
+- Form: title*, description, file_url* (or file upload to Supabase Storage bucket `documents`; accept .pdf, .doc, .docx), category (select), is_public, display_order
+- File upload: show file name and size after upload
+
+---
+
+**FAQ (`/admin/faq`)**
+- Table: question (truncated), category, display_order, is_active toggle, actions
+- Form: question*, answer* (textarea), category (select), display_order
+
+---
+
+**Depoimentos (`/admin/depoimentos`)**
+- Table: author_name, author_role, rating stars, is_active toggle, actions
+- Form: author_name*, author_role, content* (textarea), photo_url, rating (1–5 star selector), display_order
+
+---
+
+**Lista de Alunos (`/admin/alunos`)**
+- Table: full_name, belt badge, enrollment_date, phone, is_active toggle, actions
+- Search by name or CPF
+- "Novo Aluno" form: full_name*, birth_date, cpf, phone, guardian_name, guardian_phone, belt (select from belt progression), enrollment_date, is_active, notes
+- Per-student detail view (`/admin/alunos/:id`):
+  - Edit student info
+  - **Graduações tab:** list + "Adicionar Graduação" (belt*, exam_date*, exam_location, examiner, notes)
+  - **Frequência tab:** list of attendance entries + "Registrar Aula" (class_date*, present toggle, notes)
+  - **Mensalidades tab:** list + "Registrar Pagamento" (reference_month*, amount*, status*, payment_date, payment_method, notes)
+
+---
+
+**Contatos / Leads (`/admin/contatos`)**
+- Table: name, phone, interest, created_at, is_read badge, actions
+- Filter tabs: Todos | Não lidos
+- Click row → modal with full details (name, email, phone, message, interest, source, consent_lgpd, created_at)
+- "Marcar como lido" button in modal → sets `is_read = true`
+- "Responder no WhatsApp" button → `waLink(phone, '')` if phone is set
+- Delete per row with confirmation
+
+---
+
+**Configurações (`/admin/configuracoes`)**
+- Load all rows from `site_settings` as key-value pairs
+- Render each as a labeled text input (description as label, key as hint)
+- "Salvar alterações" button → batch UPDATE all changed rows
+- Success toast: "Configurações salvas."
+
+---
+
 ### SUPABASE INTEGRATION
 
 Connect to Supabase using environment variables:
