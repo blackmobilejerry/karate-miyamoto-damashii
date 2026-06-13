@@ -56,7 +56,7 @@ Create a complete, professional, modern, and responsive institutional sports web
 - **Footer** with links, social, developer credit
 
 **Navigation items:**
-Início | Sobre | Modalidades | Professores | Eventos | Galeria | Notícias | Documentos | FAQ | Contato | Área do Aluno
+Início | Sobre | Modalidades | Horários | Professores | Eventos | Galeria | Notícias | Documentos | FAQ | Contato | Área do Aluno
 
 ---
 
@@ -84,6 +84,15 @@ Início | Sobre | Modalidades | Professores | Eventos | Galeria | Notícias | Do
 - Section title: "Nossas Modalidades"
 - Grid of 4 cards (2x2 on mobile, 4x2 on desktop) loaded from Supabase `modalities` table
 - Each card: icon, title, short description, "Tenho interesse" button → WhatsApp
+
+**Schedule Teaser Section:**
+- Section title: "Horários das Turmas"
+- Subtitle: "Encontre o melhor horário para você."
+- Fetch from Supabase `class_schedules` table where `is_active = true`, ordered by `day_of_week`, `start_time`
+- Display as a responsive weekly grid grouped by day of week (Segunda → Sábado)
+- Each entry shows: turma name, time range (HH:MM–HH:MM), target audience badge
+- Day names in Portuguese: Segunda | Terça | Quarta | Quinta | Sexta | Sábado
+- CTA button below: "Ver todos os horários" → /horarios
 
 **Benefits Section:**
 - Title: "Benefícios do Karatê"
@@ -149,16 +158,38 @@ Three cards side by side:
 
 ---
 
-#### 5. PROFESSORS PAGE (`/professores`)
+#### 5. SCHEDULE PAGE (`/horarios`)
+
+**Page hero:** Title "Horários das Turmas" with breadcrumb
+
+**Schedule table:**
+- Fetch all active records from Supabase `class_schedules` table, ordered by `day_of_week ASC`, `start_time ASC`
+- Group records by `day_of_week`; show day name as section heading (Segunda-feira, Terça-feira…)
+- Each row: turma name, time range, instructor (if set), location (if set), target audience badge
+- On mobile: card layout (one card per class entry); on desktop: table layout
+- Target audience badge colors: infantil=blue, jovens=green, adultos=red, todos=gold
+
+**Filter tabs:** Todas as Turmas | Infantil | Jovens | Adultos
+- Filters by `target_audience` field (shows 'todos' in all tabs)
+
+**Empty state:** "Nenhum horário cadastrado. Entre em contato para saber as turmas disponíveis."
+
+**CTA below the table:**
+- "Quer saber mais sobre uma turma específica?"
+- Button: "Falar no WhatsApp" → primary WhatsApp link
+
+---
+
+#### 6. PROFESSORS PAGE (`/professores`)
 
 - Fetch from Supabase `professors` table where `is_active = true`
-- Card layout: photo, name, belt badge (gold styling), experience years, bio, specialties tags
+- Card layout: photo (`photo_url` with `photo_alt` as alt text), name, belt badge (gold styling), experience years, bio, specialties tags
 - If no records: show placeholder cards with "Informações do professor em breve."
 - Ordered by `display_order`
 
 ---
 
-#### 6. EVENTS PAGE (`/eventos`)
+#### 7. EVENTS PAGE (`/eventos`)
 
 - Filter tabs: Todos | Exames de Faixa | Campeonatos | Seminários | Treinos Especiais | Aulas Abertas | Eventos Internos
 - Fetch from Supabase `events` table where `is_public = true`
@@ -168,7 +199,7 @@ Three cards side by side:
 
 ---
 
-#### 7. NEWS PAGE (`/noticias`)
+#### 8. NEWS PAGE (`/noticias`)
 
 - Blog layout with featured post + grid
 - Fetch from Supabase `news` table where `is_published = true`, ordered by `published_at DESC`
@@ -181,11 +212,12 @@ Three cards side by side:
 
 ---
 
-#### 8. GALLERY PAGE (`/galeria`)
+#### 9. GALLERY PAGE (`/galeria`)
 
 - Category filter tabs: Todos | Treinos | Campeonatos | Exames de Faixa | Eventos | Alunos | Professores
 - Masonry or uniform grid layout
 - Fetch from Supabase `gallery` table where `is_active = true`
+- Each image must use the `alt_text` field as the `<img alt="">` attribute; fallback to `title` if `alt_text` is empty
 - Lightbox on click for images
 - Video thumbnails with play button overlay
 - Empty state: placeholder grid with "Galeria em construção"
@@ -193,7 +225,7 @@ Three cards side by side:
 
 ---
 
-#### 9. DOCUMENTS PAGE (`/documentos`)
+#### 10. DOCUMENTS PAGE (`/documentos`)
 
 - Fetch from Supabase `documents` table where `is_public = true`
 - Category groups: Ficha de Matrícula | Regulamento Interno | Calendário | Exame de Faixa | Autorização | Comunicados
@@ -202,7 +234,7 @@ Three cards side by side:
 
 ---
 
-#### 10. FAQ PAGE (`/perguntas-frequentes`)
+#### 11. FAQ PAGE (`/perguntas-frequentes`)
 
 - Fetch from Supabase `faq` table where `is_active = true`, ordered by `display_order`
 - Accordion component (one open at a time)
@@ -211,7 +243,7 @@ Three cards side by side:
 
 ---
 
-#### 11. CONTACT PAGE (`/contato`)
+#### 12. CONTACT PAGE (`/contato`)
 
 **Contact info card:**
 - Name: Karatê Miyamoto Damashii Caeté
@@ -222,26 +254,38 @@ Three cards side by side:
 
 **Contact form:**
 - Fields: Nome*, Email, Telefone*, Mensagem*, Modalidade de interesse (select)
+- **LGPD checkbox (required):** "Li e concordo com a Política de Privacidade e autorizo o uso dos meus dados para contato." — must be checked to enable submit. Stores `consent_lgpd = true` in the `contacts` table.
 - On submit: INSERT into Supabase `contacts` table
+- Disable submit button while loading; show spinner
 - Success toast: "Mensagem enviada! Entraremos em contato em breve."
+- Error toast: "Erro ao enviar. Tente novamente ou fale pelo WhatsApp."
 
 **Google Maps embed:**
 - Embed map for "Caeté, MG" (address placeholder — editable in settings)
 
+**Privacy policy link:**
+- Below the form: "Política de Privacidade" → `/privacidade` (simple static page describing LGPD data usage)
+
 ---
 
-#### 12. STUDENT AREA (`/area-do-aluno`)
+#### 13. STUDENT AREA (`/area-do-aluno`)
 
-- Current state: "Área em Desenvolvimento"
-- Show a professional coming-soon card
-- List features coming:
-  - Dados do aluno e graduação
-  - Controle de frequência
-  - Próximos exames de faixa
-  - Situação de mensalidades
-  - Comunicados e documentos
-  - Histórico de evolução
-- CTA button: "Fale conosco pelo WhatsApp" → WhatsApp
+**Auth flow using Supabase Auth + `profiles` table:**
+
+`/area-do-aluno` — login gate:
+- If user is **not logged in**: show a login card with email + password fields using `supabase.auth.signInWithPassword()`. Link below: "Primeiro acesso? Fale conosco." → WhatsApp.
+- If user is **logged in** with `profiles.role = 'student'`: show the student dashboard (see below).
+- If user is **logged in** with `profiles.role = 'admin'`: redirect to `/admin`.
+
+**Student Dashboard (`/area-do-aluno/dashboard`):**
+- Read `students` row where `user_id = auth.uid()` — show: nome, faixa atual, data de matrícula.
+- **Minhas Graduações:** list from `graduations` table ordered by `exam_date DESC` — belt, exam date, examiner. Empty state: "Nenhuma graduação registrada."
+- **Frequência:** last 30 entries from `attendance` table — class_date, present/absent badge. Empty state: "Nenhum registro de frequência."
+- **Mensalidades:** list from `payments` ordered by `reference_month DESC` — month, amount formatted as R$, status badge (pendente=yellow, pago=green, atrasado=red, isento=gray). Empty state: "Nenhuma mensalidade registrada."
+- **Logout button** top-right → `supabase.auth.signOut()`
+
+**If student record not found:**
+- Show: "Cadastro não encontrado. Entre em contato com a academia." → WhatsApp button.
 
 ---
 
@@ -255,7 +299,51 @@ Create a `src/lib/supabase.ts` client file.
 
 Create typed hooks/queries for each table using Supabase's generated types.
 
-All public-facing data fetches use the anon key with RLS policies already configured.
+**RLS — Row Level Security (already configured in schema):**
+
+The schema uses a `profiles` table to distinguish users by role:
+- `profiles.role = 'admin'` → full CRUD access to all tables via the `is_admin()` SQL function
+- `profiles.role = 'student'` → read-only access to their own `students`, `payments`, `attendance`, and `graduations` rows
+- Anonymous visitors → read-only on public content tables
+
+**Never use `auth.role() = 'authenticated'` as an RLS check** — that would give any logged-in user admin access. The schema already handles this via `is_admin()`.
+
+A profile row is created automatically via database trigger when a user signs up. All new users start as `role = 'student'`; the admin must manually update `profiles.role = 'admin'` for administrators in the Supabase dashboard.
+
+**Tables and their public access pattern:**
+
+| Table | Anonymous read | Student self-read | Admin full access |
+|---|---|---|---|
+| `professors`, `modalities`, `class_schedules`, `events`, `news`, `gallery`, `documents`, `faq`, `testimonials`, `site_settings` | ✅ (filtered) | — | ✅ |
+| `contacts` | insert only (consent_lgpd=true) | — | ✅ |
+| `students`, `payments`, `attendance`, `graduations` | ❌ | ✅ own rows | ✅ |
+| `profiles` | ❌ | ✅ own row | ✅ |
+
+**Key queries to implement in `src/hooks/`:**
+
+```ts
+// Public
+useClassSchedules()   // class_schedules where is_active=true, order by day_of_week, start_time
+useModalities()       // modalities where is_active=true, order by display_order
+useUpcomingEvents()   // events where is_public=true and event_date >= today, limit 3
+useLatestNews(n)      // news where is_published=true, order by published_at desc, limit n
+useNewsBySlug(slug)   // news where slug = :slug and is_published = true
+useFaq()              // faq where is_active=true, order by display_order
+useProfessors()       // professors where is_active=true, order by display_order
+useTestimonials()     // testimonials where is_active=true, order by display_order
+useSiteSettings()     // site_settings (all rows as key-value map)
+
+// Auth-gated (student)
+useMyStudent()        // students where user_id = auth.uid()
+useMyPayments()       // payments where student_id = myStudent.id, order by reference_month desc
+useMyAttendance()     // attendance where student_id = myStudent.id, order by class_date desc, limit 30
+useMyGraduations()    // graduations where student_id = myStudent.id, order by exam_date desc
+
+// Auth-gated (user profile)
+useMyProfile()        // profiles where id = auth.uid()
+```
+
+All public-facing data fetches work with the anon key — no auth token required.
 
 ---
 
@@ -271,8 +359,21 @@ In `index.html` and per-page meta tags:
 
 ### WHATSAPP LINKS
 
-Primary: `https://wa.me/5531988128515?text=Olá,%20tenho%20interesse%20nas%20aulas%20de%20karatê%20da%20Miyamoto%20Damashii%20Caeté.`
-Secondary: `https://wa.me/5531991921476?text=Olá,%20tenho%20interesse%20nas%20aulas%20de%20karatê%20da%20Miyamoto%20Damashii%20Caeté.`
+Always build WhatsApp links in code using `encodeURIComponent()` — never hardcode the text with raw accented characters in the URL.
+
+```ts
+const WA_PRIMARY = '5531988128515'
+const WA_SECONDARY = '5531991921476'
+const WA_DEFAULT_TEXT = 'Olá, tenho interesse nas aulas de karatê da Miyamoto Damashii Caeté.'
+
+export const waLink = (phone = WA_PRIMARY, text = WA_DEFAULT_TEXT) =>
+  `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
+```
+
+Use `waLink()` everywhere a WhatsApp URL is needed. For modality-specific messages:
+```ts
+waLink(WA_PRIMARY, `Olá, tenho interesse na modalidade ${modality.title} da Miyamoto Damashii Caeté.`)
+```
 
 ---
 
@@ -291,7 +392,7 @@ Show/hide based on scroll position (show after 100px scroll).
 Karatê Miyamoto Damashii Caeté
 Tradição, disciplina e evolução através do Karatê Kyokushin.
 
-Quick links: Início | Sobre | Modalidades | Eventos | Galeria | Contato
+Quick links: Início | Sobre | Modalidades | Horários | Eventos | Galeria | Contato | Política de Privacidade
 
 Instagram: @karatemiyamotodamashiicaete
 WhatsApp: (31) 98812-8515
